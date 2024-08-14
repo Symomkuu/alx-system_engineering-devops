@@ -1,26 +1,26 @@
 #!/usr/bin/python3
-"""prints the titles of the first 10 hot posts listed for a given subreddit.
-
-"""
 import requests
 
 
 def top_ten(subreddit):
-    '''Return the title of the first 10 hot posts
-    listed for a given subreddit'''
-    try:
-        url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-        headers = {
-            "User-Agent": "linux:0x16.api.advanced:v1.0.0\
-            (by /u/Large_Alternative_30)",
-        }
-        response = requests.get(url, headers=headers, allow_redirects=False)
-        if (response.status_code == 404):
-            print('None')
-            return 0
-        request = response.json().get('data').get('children')
-        for i in range(10):
-            print(request[i].get('data').get('title'))
-    except Exception:
-        print('None')
-        return 0
+    """ queries Reddit API and prints the titles of
+    first 10 hot posts listed for a given subreddit.
+
+    If not a valid subreddit, print None.
+    Ensure that you are not following redirects.
+    """
+    url_base = 'http://www.reddit.com/r/'
+    url_query = '{:s}/hot.json?limit={:d}'.format(subreddit, 10)
+    headers = {'user-agent': 'egsyquest'}
+    r = requests.get(url_base + url_query, headers=headers)
+
+    if (r.status_code is 302):
+        print("None")
+        return
+    if (r.status_code is 404):
+        print("None")
+        return
+    else:
+        r = r.json()
+        for post in r['data']['children']:
+            print(post['data']['title'])
