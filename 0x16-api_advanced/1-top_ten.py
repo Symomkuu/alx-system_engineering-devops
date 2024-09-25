@@ -1,26 +1,34 @@
 #!/usr/bin/python3
-"""prints the titles of the first 10 hot posts listed for a given subreddit.
-
-"""
+"""A module that prints the top 10 hot posts for a subreddit"""
 import requests
 
 
 def top_ten(subreddit):
-    '''Return the title of the first 10 hot posts
-    listed for a given subreddit'''
+    """
+    Queries the Reddit API and prints the titles of the top 10
+    hot posts for a given subreddit.
+    
+    Args:
+        subreddit (str): The subreddit to query.
+    """
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    
     try:
-        url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-        headers = {
-            "User-Agent": "linux:0x16.api.advanced:v1.0.0\
-            (by /u/Large_Alternative_30)",
-        }
         response = requests.get(url, headers=headers, allow_redirects=False)
-        if (response.status_code == 404):
-            print('None')
-            return 0
-        request = response.json().get('data').get('children')
-        for i in range(10):
-            print(request[i].get('data').get('title'))
-    except Exception:
-        print('None')
-        return 0
+        
+        if response.status_code != 200:
+            print(None)
+            return
+        data = response.json().get("data", {})
+        children = data.get("children", [])
+
+        for i in range(min(10, len(children))):
+            print(children[i]["data"]["title"])
+
+        if len(children) == 0:
+            print(None)
+
+    except requests.RequestException:
+        print(None)
+
